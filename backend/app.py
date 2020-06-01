@@ -8,6 +8,7 @@ import sys
 
 from models import setup_db, Question, Category
 
+
 QUESTIONS_PER_PAGE = 10
 
 def create_app(test_config=None):
@@ -18,7 +19,7 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-  cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+  cors = CORS(app)
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
   '''
@@ -56,7 +57,7 @@ def create_app(test_config=None):
       success = False
       print(sys.exc_info())
     if not success:
-      abort (400)
+      abort (422)
     else:
       success =True
     return jsonify({
@@ -94,7 +95,7 @@ def create_app(test_config=None):
       success = False
       print(sys.exc_info())
     if not success:
-      abort (404)
+      abort (422)
     else:
       success =True
     return jsonify({
@@ -146,6 +147,31 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions',methods=['POST'])
+  def post_question():
+    success = False
+    try:
+      question = request.json.get('question',None)
+      answer = request.json.get('answer',None)
+      difficulty = request.json.get('difficulty',None)
+      category = request.json.get('category',None)
+      if not (question and answer and category and difficulty):
+              return abort(400,'Required question details are missing. Please retry','body')
+      question_instance = Question(question,answer,category,difficulty)
+      question_instance.insert()
+      success = True
+      question_list=Question.query.all();
+      paginated_question_list = paginate_questions(request,question_list)
+      return jsonify({
+            'success': True,
+            'questions': paginated_question_list,
+            'total_questions': len(question_list),
+            'question_added': question_instance.format()
+          })
+    except:
+      return abort(422,'An Error occurred, please retry','body')
+    
+
 
   '''
   @TODO: 
@@ -157,7 +183,28 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
-
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    try:
+      page = request.args.get('page',1,type=int)
+      search_term=request.json.get('searchTerm', '')
+      print(search_term)
+      search = "%{}%".format(search_term)
+      print(search)
+      search_response = Question.query.filter(Question.question.ilike(search)).all()
+      print(search_response)
+      paginated_question_list = paginate_questions(request,search_response)
+      print(paginated_question_list)
+      return jsonify({
+          "success": True,
+          "questions": paginated_question_list,
+          "total_questions": len(search_response),
+          "currentPage" : page
+        })
+    except:
+        print(sys.exc_info())
+        return abort(404)
+      
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
@@ -166,7 +213,24 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/categories/<int:ctgy_id>/questions')
+  def get_category_wise_questions(ctgy_id):
+    try:
+      print(ctgy_id)
+      question_list = Question.query.filter(Question.category==ctgy_id).all()
+      print(question_list)
+      if question_list is None :
+        abort(404)
 
+      paginated_question_list = paginate_questions(request,question_list)
+      return jsonify({
+            'success': True,
+            'questions': paginated_question_list,
+            'total_questions': len(question_list),
+            'current_category':ctgy_id
+          })
+    except:
+      abort(422)
 
   '''
   @TODO: 
@@ -185,7 +249,21 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
-  
+  @app.errorhandler(404)
+  def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Resource not found'
+          }),404
+
+  @app.errorhandler(422)
+  def not_processed(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'Request cannot be processed'
+          }),422
 
 
   return app
