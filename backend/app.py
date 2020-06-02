@@ -5,6 +5,7 @@ from flask_cors import CORS
 import random
 import json
 import sys
+from sqlalchemy.sql import func
 
 from models import setup_db, Question, Category
 
@@ -243,7 +244,35 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def post_next_question():
+    print('hi')
 
+    try:
+      prev_question_list = request.json.get('previous_questions')
+      print(prev_question_list)
+      category_id = int(request.json.get('quiz_category').get('id'))
+      print(category_id)
+      if len(prev_question_list) > 0 and category_id != 0 :
+        question = Question.query.filter(Question.category==category_id).filter(Question.id.notin_(prev_question_list)).order_by(func.random()).first()
+      elif len(prev_question_list) <= 0 and category_id != 0 :
+        question = Question.query.filter(Question.category==category_id).order_by(func.random()).first()
+      elif len(prev_question_list) > 0 and category_id == 0 :
+        question = Question.query.filter(Question.id.notin_(prev_question_list)).order_by(func.random()).first()
+      else :
+        question = Question.query.order_by(func.random()).first()
+
+      print(question)
+      if question is None :
+        abort(404)
+      return jsonify({
+            'success': True,
+            'question':  question.format(),
+            'current_category':category_id
+          })
+    except:
+      print(sys.exc_info())
+      abort(422)
   '''
   @TODO: 
   Create error handlers for all expected errors 
