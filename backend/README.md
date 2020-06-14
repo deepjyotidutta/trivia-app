@@ -82,14 +82,14 @@ GET "/categories"
   }
   ```
 
-    GET "/questions?page=1"
-        Fetches the questions based on the page number
-        Request Parameters: page: Page number
-        Response Body:
-          questions: List of questions
-          categories: Dictionary of Category ID <-> Category Type
-          total_questions: Total number of questions
-          currentPage : page number
+GET "/questions?page=1"
+    Fetches the questions based on the page number
+    Request Parameters: page: Page number
+    Response Body:
+      questions: List of questions
+      categories: Dictionary of Category ID <-> Category Type
+      total_questions: Total number of questions
+      currentPage : page number
 ```bash
 {
   "categories": {
@@ -115,34 +115,42 @@ GET "/categories"
   "total_questions": 18
 }
 ```
-    DELETE "/questions/int:question_id"
-        Deletes a question from the database
-        Request Parameters: question_id: Question ID to delete
-        Response Body:
-
-    deleted: Question ID that is deleted
-
+DELETE "/questions/int:question_id"
+    Deletes a question
+    Request Parameters: question_id: Question ID to be deleted
+    Response Body:
+      deleted: Deleted Question ID
+```bash
 {
-  "deleted": 20
+  "question_deleted": 15,
+  "questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": 4,
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }
+  ],
+  "success": true,
+  "total_questions": 17
 }
-
-    POST "/questions"
-        Adds a questions to the database
-        Request Body:
-
-    question: Question statement
-
-    answer: Answer statement
-
-    category: Category ID
-
-    difficulty: Difficulty Level
-        Response Body:
-
-    question: Question object that is created
-
+```
+POST "/questions"
+    Adds a questions to the DB
+    Request Body:
+      question: Question
+      answer: Answer
+      category: Category ID
+      difficulty: Difficulty Level
+    Response Body:
+      question_added: Question obect that is created
+      total_questions: Total Number of questions
+      questions: List of all questions
+```bash
 {
-  "question": {
+  "total_questions": 20,
+  "question_added": {
     "id": 1,
     "question": "",
     "answer": "",
@@ -150,18 +158,15 @@ GET "/categories"
     "difficulty": 1
   }
 }
-
-    POST "/search"
-        Fetches questions based on the search term
-        Request Body:
-
-    searchTerm: Search term
-        Response Body:
-
-    questions: List of questions found in search
-
-    total_questions: Total number of questions
-
+```
+POST "/search"
+    Fetches questions based on the search term
+    Request Body:
+      searchTerm: Search term
+    Response Body:
+      questions: List of questions found in search
+      total_questions: Total number of questions
+```bash
 {
   "questions": [{
     "id": 1,
@@ -172,18 +177,15 @@ GET "/categories"
   }],
   "total_questions": 1
 }
-
-    GET "/categories/int:category_id/questions"
-        Fetches questions for the requested category
-        Request Parameters: category_id: Category ID for questions
-        Response Body:
-
-    questions: List of category questions
-
-    total_questions: Total number of questions
-
-    current_category: Current category ID
-
+```
+GET "/categories/int:category_id/questions"
+    Fetches questions from the requested category
+    Request Parameters: category_id: Category ID for questions
+    Response Body:
+      questions: List of category questions
+      total_questions: Total number of questions
+      current_category: Current category ID
+```bash
 {
   "questions": [{
     "id": 1,
@@ -195,18 +197,15 @@ GET "/categories"
   "total_questions": 1,
   "current_category": 1
 }
-
-    POST "/quizzes"
-        Fetches a unique question for the quiz on selected category
-        Request Body:
-
-    previous_questions: List of previously answered questions
-
-    quiz_category: Category object of the quiz
-        Response Body:
-
-    question: Random question of requested category
-
+```
+POST "/quizzes"
+    Fetches a new question for the quiz from a selected category
+    Request Body:
+      previous_questions: List of previously answered questions
+      quiz_category: Category object of the quiz
+    Response Body:
+      question: Random question of requested category
+```bash
 {
   "question": {
     "id": 1,
@@ -216,7 +215,7 @@ GET "/categories"
     "difficulty": 1
   }
 }
-
+```
 ## Testing
 To run the tests, run
 ```
