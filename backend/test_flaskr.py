@@ -15,7 +15,8 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://postgres:pass@{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgres://postgres:pass@{}/{}".format(
+            'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -31,7 +32,7 @@ class TriviaTestCase(unittest.TestCase):
             'category': 4,
             'difficulty': 2
         }
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -40,6 +41,7 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
+
     def test_get_categories(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
@@ -64,12 +66,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual((data['message']), 'Resource not found')
 
     def test_delete_question(self):
-        question = Question(question='New question for deletion', answer='New answer for deletion',difficulty=1, category=1)
+        question = Question(
+            question='New question for deletion',
+            answer='New answer for deletion',
+            difficulty=1,
+            category=1)
         question.insert()
         question_id = question.id
         res = self.client().delete('/questions/{}/'.format(question_id))
         data = json.loads(res.data)
-        question = Question.query.filter(Question.id == question.id).one_or_none()
+        question = Question.query.filter(
+            Question.id == question.id).one_or_none()
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['question_deleted'], question_id)
@@ -152,7 +159,11 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["message"], "Resource not found")
 
     def test_post_next_question(self):
-        nextRoundQuestion = {'previous_questions': [],'quiz_category': {'type': 'Entertainment', 'id': 5}}
+        nextRoundQuestion = {
+            'previous_questions': [],
+            'quiz_category': {
+                'type': 'Entertainment',
+                'id': 5}}
         res = self.client().post('/quizzes', json=nextRoundQuestion)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
@@ -166,7 +177,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "Request cannot be processed")
-    
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
