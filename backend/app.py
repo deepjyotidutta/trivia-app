@@ -98,7 +98,10 @@ def create_app(test_config=None):
     if not success:
       abort (422)
     else:
-      success =True
+      if not len(paginated_question_list):
+        abort(404)
+      else:
+        success =True
     return jsonify({
             'success': True,
             'categories': {category.id: category.type for category in category_list},
@@ -120,9 +123,8 @@ def create_app(test_config=None):
   def delete_question(question_id):
     try:
       question = Question.query.get(question_id)
-
       if question is None:
-        abort(404)
+        abort(422)
 
       question.delete()
       question_list=Question.query.all();
@@ -196,6 +198,8 @@ def create_app(test_config=None):
       print(search_response)
       paginated_question_list = paginate_questions(request,search_response)
       print(paginated_question_list)
+      if not len(paginated_question_list):
+        abort(404)
       return jsonify({
           "success": True,
           "questions": paginated_question_list,
