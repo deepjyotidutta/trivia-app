@@ -43,14 +43,9 @@ From within the `backend` directory first ensure you are working using your crea
 To run the server, execute:
 
 ```bash
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-flask run
+FLASK_APP=app.py FLASK_DEBUG=true flask run
 ```
 
-Setting the `FLASK_ENV` variable to `development` will detect file changes and restart the server automatically.
-
-Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
 
 ## Tasks
 
@@ -70,45 +65,56 @@ One note before you delve into your tasks: for each endpoint you are expected to
 
 ## API Documentation
 GET "/categories"
-        Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-        Request Parameters: None
-        Response Body:
-
-    categories: Dictionary of Category ID <-> Category Type
-
-{
-  "categories": {
-    "1": "Science",
-    "2": "Art"
-  } 
-}
+    Fetches a dictionary of categories
+    Request Parameters: None
+    Response Body: categories: Dictionary of Category ID <-> Category Type
+  ```bash
+  {
+    "categories": {
+      "1": "Science",
+      "2": "Art",
+      "3": "Geography",
+      "4": "History",
+      "5": "Entertainment",
+      "6": "Sports"
+    },
+    "success": true
+  }
+  ```
 
     GET "/questions?page=1"
-        Fetches the questions to be displayed on the page using page number
+        Fetches the questions based on the page number
         Request Parameters: page: Page number
         Response Body:
-
-    questions: List of questions
-
-    categories: Dictionary of Category ID <-> Category Type
-
-    total_questions: Total number of questions
-
+          questions: List of questions
+          categories: Dictionary of Category ID <-> Category Type
+          total_questions: Total number of questions
+          currentPage : page number
+```bash
 {
-  "questions": [{
-    "id": 1,
-    "question": "",
-    "answer": "",
-    "category": 1,
-    "difficulty": 1
-  }],
   "categories": {
     "1": "Science",
-    "2": "Art"
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
   },
-  "total_questions": 1
+  "currentPage": 1,
+  "current_category": "None",
+  "questions": [
+    {
+      "answer": "Maya Angelou",
+      "category": 4,
+      "difficulty": 2,
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }
+  ],
+  "success": true,
+  "total_questions": 18
 }
-
+```
     DELETE "/questions/int:question_id"
         Deletes a question from the database
         Request Parameters: question_id: Question ID to delete
